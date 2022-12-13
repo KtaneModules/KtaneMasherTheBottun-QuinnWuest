@@ -5,8 +5,10 @@ using KModkit;
 using System.Collections;
 using System.Text.RegularExpressions;
 using Random = UnityEngine.Random;
+using System.Collections.Generic;
 
-public class masherTheBottunScript : MonoBehaviour {
+public class masherTheBottunScript : MonoBehaviour
+{
 
     public KMBombModule Module;
     public KMBombInfo Info;
@@ -21,7 +23,7 @@ public class masherTheBottunScript : MonoBehaviour {
     private int _moduleId;
     private bool solved = false;
 
-    private int[] positions = { 0,0,0,0 };
+    private int[] positions = { 0, 0, 0, 0 };
     private int numberDisplayed = 0;
     private int sectionUsed = 0;
     private int lastStage = 69420;
@@ -36,7 +38,7 @@ public class masherTheBottunScript : MonoBehaviour {
     private static readonly DayOfWeek todayDayOfWeek = DateTime.Today.DayOfWeek;
 
     private static readonly int[] wordFormLengths = { 4, 3, 3, 5, 4, 4, 3, 5, 5, 4, 3, 6, 6, 8, 8, 7, 7, 9, 8, 8 };
-    
+
     private bool doingTheMorseThing = false;
     private bool doingTheCycleThing = false;
     private bool doingTheSpinThing = false;
@@ -47,7 +49,7 @@ public class masherTheBottunScript : MonoBehaviour {
     private int[] spinDirections = { 0, 0, 0 };
 
     private bool lastStageWasWrong = false;
-    
+
     private int[] previousSections = { 99, 99, 99, 99 };
     private int stageNo = 0;
 
@@ -55,12 +57,13 @@ public class masherTheBottunScript : MonoBehaviour {
     private int[] spinTargets;
 
     // Use this for initialization
-    void Start () {
+    void Start()
+    {
         _moduleId = _moduleIdCounter++;
         Module.OnActivate += Activate;
 
         Init();
-	}
+    }
 
     void Activate()
     {
@@ -79,12 +82,7 @@ public class masherTheBottunScript : MonoBehaviour {
         screenText.text = numberDisplayed.ToString();
         Debug.LogFormat("[Masher The Bottun #{0}] The starting number was {1}.", _moduleId, numberDisplayed);
 
-        for (int i = 0; i < 4; i++)
-        {
-            positions[i] = Random.Range(1, numberDisplayed);
-            while (positions.ToList().Where(x => x == positions[i]).Count() > 1)
-                positions[i] = Random.Range(0, numberDisplayed);
-        }
+        positions = Enumerable.Range(1, numberDisplayed - 5).ToArray().Shuffle().Take(4).OrderBy(x => x).Reverse().ToArray();
 
         Debug.LogFormat("[Masher The Bottun #{0}] The four stages are, in order of generation, {1}, {2}, {3}, and {4}.", _moduleId, positions[0], positions[1], positions[2], positions[3]);
     }
@@ -156,7 +154,7 @@ public class masherTheBottunScript : MonoBehaviour {
                 lastStageWasWrong = true;
             }
         }
-        
+
         if (lastStage == 6)
         {
             doingTheOtherSlightlyDifferentSpinThing = false;
@@ -270,7 +268,7 @@ public class masherTheBottunScript : MonoBehaviour {
                     Info.GetPorts().Contains("RJ45"),
                     Info.GetStrikes() > 0,
                     todayDayOfWeek == DayOfWeek.Monday || todayDayOfWeek == DayOfWeek.Wednesday || todayDayOfWeek == DayOfWeek.Friday,
-                    Info.GetSolvedModuleNames().Count() <= Info.GetSolvedModuleNames().Count() / 2}; 
+                    Info.GetSolvedModuleNames().Count() <= Info.GetSolvedModuleNames().Count() / 2};
                 int[] locations = { 3, 2, 2, 0, 6, 4, 5, 1, 0, 5, 1, 6, 4, 3 }; // first number in each pair = yes, second number = no
 
                 while (!visitedCells[currentCell])
@@ -283,8 +281,8 @@ public class masherTheBottunScript : MonoBehaviour {
                 }
                 switch (currentCell)
                 {
-                    case 0: bgColorTargets = new int[] { 5, 15, 25, 35, 45, 55};  Debug.LogFormat("[Masher The Bottun #{0}] You should press the button when the last seconds digit is a 5.", _moduleId); break;
-                    case 1: bgColorTargets = new int[] { 19, 28, 37, 46, 55 };    Debug.LogFormat("[Masher The Bottun #{0}] You should press the button when the seconds digits add up to 10.", _moduleId); break;
+                    case 0: bgColorTargets = new int[] { 5, 15, 25, 35, 45, 55 }; Debug.LogFormat("[Masher The Bottun #{0}] You should press the button when the last seconds digit is a 5.", _moduleId); break;
+                    case 1: bgColorTargets = new int[] { 19, 28, 37, 46, 55 }; Debug.LogFormat("[Masher The Bottun #{0}] You should press the button when the seconds digits add up to 10.", _moduleId); break;
                     case 2: bgColorTargets = new int[] { 7, 17, 27, 37, 47, 57 }; Debug.LogFormat("[Masher The Bottun #{0}] You should press the button when the last seconds digit is a 7.", _moduleId); break;
                     case 3: bgColorTargets = new int[] { 0, 10, 20, 30, 40, 50 }; Debug.LogFormat("[Masher The Bottun #{0}] You should press the button when the last seconds digit is a 0.", _moduleId); break;
                     case 4: bgColorTargets = new int[] { 7, 16, 25, 34, 43, 52 }; Debug.LogFormat("[Masher The Bottun #{0}] You should press the button when the seconds digits add up to 7.", _moduleId); break;
@@ -356,10 +354,7 @@ public class masherTheBottunScript : MonoBehaviour {
                     {
                         if (xValue % 2 == 0)
                             target += 5;
-                        xValue = 0;
-                        foreach (string module in Info.GetSolvableModuleNames())
-                            if (module.ToLowerInvariant().Contains("button"))
-                                xValue += 1;
+                        xValue = Info.GetSolvableModuleNames().Select(i => i.ToLowerInvariant()).Where(i => i.Contains("button")).Count();
                     }
                     if (letter == 'J' || letter == 'W')
                     {
@@ -398,9 +393,7 @@ public class masherTheBottunScript : MonoBehaviour {
                         Debug.LogFormat("[Masher The Bottun #{0}] The number is now {1}. [X] is now {2}.", _moduleId, target, xValue);
                 }
 
-                if (target < 0)
-                    target *= -1;
-                target %= 10;
+                target = ((Math.Abs(target) % 10) + 10) % 10;
                 Debug.LogFormat("[Masher The Bottun #{0}] You should press the button when the last digit of the timer is {1}.", _moduleId, target);
                 bitch = target;
                 // somewhere between the above message and the start of Press() target gets changed to zero, and i've been trying to figure out why for an hour, so i just did this and it works. whatever
@@ -473,7 +466,7 @@ public class masherTheBottunScript : MonoBehaviour {
 
                 int offset = 0;
                 if (numberDisplayed > 9)
-                    offset = numberDisplayed / 10
+                    offset = numberDisplayed / 10;
                 else
                     offset = numberDisplayed;
 
@@ -529,7 +522,7 @@ public class masherTheBottunScript : MonoBehaviour {
                 Predicate<int>[] chosen3 = Enumerable.Range(0, 3).Select(x => conditions[x][spinDirections[x]]).ToArray();
                 spinTargets = Enumerable.Range(0, 60).Where(num => chosen3.All(pred => pred(num))).ToArray();
                 Debug.LogFormat("[Masher The Bottun #{0}] Correct timer digits to submit are {1}.", _moduleId, spinTargets.Join(", "));
-                    StartCoroutine(ModuleSpin(spinDirections));
+                StartCoroutine(ModuleSpin(spinDirections));
             }
 
             if (sectionUsed == 7)
@@ -570,10 +563,11 @@ public class masherTheBottunScript : MonoBehaviour {
 
                 StartCoroutine(SayStuff(words));
                 target = (singleUsed + 1) % 10;
-                Debug.LogFormat("{0}", target);
 
                 Debug.LogFormat("[Masher The Bottun #{0}] The words are {1}, {2}, and {3}.", _moduleId, words[0], words[1], words[2]);
                 Debug.LogFormat("[Masher The Bottun #{0}] Two of the words are from quote #{1}, and one is from quote #{2}.", _moduleId, (doubleUsed + 1) % 10, (singleUsed + 1) % 10);
+                
+                Debug.LogFormat("[Masher The Bottun #{0}] You should press the button when the last digit of the timer is {1}.", _moduleId, target);
             }
 
             if (sectionUsed == 8)
@@ -592,35 +586,15 @@ public class masherTheBottunScript : MonoBehaviour {
                 Debug.LogFormat("[Masher The Bottun #{0}] The number is {1}.", _moduleId, table[theOtherNumber]);
 
                 if (sound == theOtherNumber)
-                {
-                    target = theOtherNumber;
-                    Debug.LogFormat("The sound and the number are in the same cell.");
-                }
+                    Debug.LogFormat("[Masher The Bottun #{0}] The sound and the number are in the same cell.", _moduleId);
                 else if (sound / 3 == theOtherNumber / 3)
-                {
-                    Debug.LogFormat("The sound and the number are in the same row.");
-                    if ((sound / 3 * 3 + 1) % 9 != theOtherNumber)
-                        target = sound / 3 * 3 + 1;
-                    else
-                        target = sound / 3 * 3 + 2;
-                }
+                    Debug.LogFormat("[Masher The Bottun #{0}] The sound and the number are in the same row.", _moduleId);
                 else if (sound % 3 == theOtherNumber % 3)
-                {
-                    Debug.LogFormat("The sound and the number are in the same column.");
-                    if ((sound + 3) % 9 != theOtherNumber)
-                        target = (sound + 3) % 9;
-                    else
-                        target = (sound + 6) % 9;
-                }
+                    Debug.LogFormat("[Masher The Bottun #{0}] The sound and the number are in the same column.", _moduleId);
                 else
-                {
-                    Debug.LogFormat("The sound and the number are not in the same row or column.");
-                    for (int i = 0; i < 9; i++)
-                        if (sound % 3 != i % 3 && theOtherNumber % 3 != i % 3 && sound / 3 != i / 3 && theOtherNumber / 3 != i / 3)
-                            target = i;
-                }
-
-                target = table[target];
+                    Debug.LogFormat("[Masher The Bottun #{0}] The sound and the number are not in the same row or column.", _moduleId);
+                target = table[(6 - (sound / 3) - (theOtherNumber / 3)) % 3 * 3 + ((6 - (sound % 3) - (theOtherNumber % 3)) % 3)];
+                Debug.LogFormat("[Masher The Bottun #{0}] You should press the button when the last digit of the timer is {1}.", _moduleId, target);
             }
         }
 
@@ -640,9 +614,11 @@ public class masherTheBottunScript : MonoBehaviour {
         string[] wrongOrder = { "the in button", "rite the in", "order rite the", "you order rite", "dont you order", "how know dont", "count how know", "1234 count how", "lol 1234 count", "xd lol 1234", "press xd lol", "button press xd", "order in button", "1234 order in", "have 1234 order", "fun have 1234" };
         // i'm so fucking funny
         string[] dontPressForwards = { "dont pres the", "pres the red", "the red button", "red button you", "button you press", "you press red", "press red button", "red button haha", "button haha press", "haha press the", "press the button", "the button with", "button with the", "with the green", "the green light", "green light dont", "light dont press", "dont press button", "press button with", "button with red", "with red light", "red light easy", "light easy haven", "easy haven fun" };
-        string[] dontPressBackward = { "the pres dont", "red the pres", "button red the", "you button red", "press you button", "red press you", "button red press", "haha button red", "press haha button", "the press haha", "button the press", "with button the", "the with button", "green the with", "light green the", "dont light green", "press dont light", "button press dont", "with button press", "red with button", "light red with", "easy light red", "haven easy light", "fun haven easy" };
+        // string[] dontPressBackward = { "the pres dont", "red the pres", "button red the", "you button red", "press you button", "red press you", "button red press", "haha button red", "press haha button", "the press haha", "button the press", "with button the", "the with button", "green the with", "light green the", "dont light green", "press dont light", "button press dont", "with button press", "red with button", "light red with", "easy light red", "haven easy light", "fun haven easy" };
         // there's probably a better way of doing this. let me know if there is.
-        
+        string[] dontPressBackward = dontPressForwards.Select(i => i.Split(' ').Reverse().Join(" ")).ToArray();
+        // yes there is. -quinn wuest
+
         string[] listOfPhrases = { };
 
         if (manual == 0)
@@ -716,7 +692,7 @@ public class masherTheBottunScript : MonoBehaviour {
 
         screenText.color = currentColor;
     }
-    
+
     IEnumerator NumberCycle(int[] numbers)
     {
         var index = 0;
@@ -828,48 +804,38 @@ public class masherTheBottunScript : MonoBehaviour {
     }
 
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"Use <!{0} masher> to masher the btmuno until something happens. Use <!{0} masher at 5> to masher the bnutianot when the last digit of the bomb's timer is that number. Use two digits to specify the last 2 digits.";
+    private readonly string TwitchHelpMessage = @"Use <!{0} masher> to masher the bottun until something happens. Use <!{0} masher at 5> to masher the bottun when the last digit of the bomb's timer is that number. Use two digits to specify the last 2 digits.";
 #pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string command)
     {
-        command = command.Trim().ToUpperInvariant();
-        if (command == "MASHER")
+        var m = Regex.Match(command, @"^\s*masher(\s+at\s+(?<digit>\d+))?\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        if (m.Success)
         {
+            var mashTime = m.Groups["digit"].Value;
+            if (mashTime.Length > 2)
+                yield break;
+            if (mashTime.Length == 1 || mashTime.Length == 2)
+            {
+                int num;
+                if (!int.TryParse(mashTime, out num) || num < 0 || num > 59)
+                    yield break;
+                yield return null;
+                while ((int)Info.GetTime() % (mashTime.Length == 1 ? 10 : 60) == num)
+                    yield return null;
+                while ((int)Info.GetTime() % (mashTime.Length == 1 ? 10 : 60) != num)
+                    yield return "trycancel you stopped the buoont pressing?!!?!? wtf how!?!!?!";
+            }
             yield return null;
             do
             {
                 btnSelectable.OnInteract();
                 yield return new WaitForSeconds(0.1f);
-            } while (!positions.Contains(numberDisplayed));
+            }
+            while (!positions.Contains(numberDisplayed));
+            yield break;
         }
-        else if (Regex.IsMatch(command, @"^MASHER\s+(AT\s+)?[0-9]$"))
-        {
-            yield return null;
-            int submit = command.Last() - '0';
-            while ((int)Info.GetTime() % 10 == submit)
-                yield return null;
-            while ((int)Info.GetTime() % 10 != submit)
-                yield return "trycancel you stopped the buoont pressing?!!?!? wtf how!?!!?!";
-            do
-            {
-                btnSelectable.OnInteract();
-                yield return new WaitForSeconds(0.1f);
-            } while (!positions.Contains(numberDisplayed));
-        }
-        else if (Regex.IsMatch(command, @"^MASHER\s+(AT\s+)?[0-5][0-9]$"))
-        {
-            int submit = 10 * (command[command.Length - 2] - '0') + (command.Last() - '0');
-            while ((int)Info.GetTime() % 60 == submit)
-                yield return null;
-            while ((int)Info.GetTime() % 60 != submit)
-                yield return "trycancel you stopped the b pressing?!!?!? wtf how!?!!?!";
-            do
-            {
-                btnSelectable.OnInteract();
-                yield return new WaitForSeconds(0.1f);
-            } while (!positions.Contains(numberDisplayed));
-        }            
+        yield break;
     }
 
     IEnumerator TwitchHandleForcedSolve()
@@ -881,7 +847,7 @@ public class masherTheBottunScript : MonoBehaviour {
                 btnSelectable.OnInteract();
                 yield return new WaitForSeconds(0.1f);
                 if (solved) //Needs to break here or else the module will autosolve and then just wait on 0 forever.
-                    yield break; 
+                    yield break;
             }
             switch (sectionUsed)
             {

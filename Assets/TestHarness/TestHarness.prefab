@@ -20209,8 +20209,8 @@ MonoBehaviour:
   - {fileID: 8300000, guid: dafe067d9083fb0498ba2bc1514259db, type: 3}
   - {fileID: 8300000, guid: 33b73b2f40324084ebc5fcb1b338f905, type: 3}
   - {fileID: 8300000, guid: 8d54a8c5f0c714346b514dcb48467745, type: 3}
-  StrikeCount: 3
-  TimeLimit: 600
+  StrikeCount: 100
+  TimeLimit: 6000
   BombSize: 1
   FrontFaceOnly: 1
   EdgeworkConfiguration: {fileID: 0}
