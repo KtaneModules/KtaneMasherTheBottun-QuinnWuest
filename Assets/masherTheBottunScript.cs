@@ -46,11 +46,11 @@ public class masherTheBottunScript : MonoBehaviour
     private bool shutTheFuckUp = false;
 
     private bool clockwise = true;
-    private int[] spinDirections = { 0, 0, 0 };
+    private readonly int[] spinDirections = { 0, 0, 0 };
 
     private bool lastStageWasWrong = false;
 
-    private int[] previousSections = { 99, 99, 99, 99 };
+    private readonly int[] previousSections = { 99, 99, 99, 99 };
     private int stageNo = 0;
 
     private int[] bgColorTargets;
@@ -60,13 +60,6 @@ public class masherTheBottunScript : MonoBehaviour
     void Start()
     {
         _moduleId = _moduleIdCounter++;
-        Module.OnActivate += Activate;
-
-        Init();
-    }
-
-    void Activate()
-    {
         btnSelectable.OnInteract += delegate ()
         {
             btnSelectable.AddInteractionPunch();
@@ -74,6 +67,7 @@ public class masherTheBottunScript : MonoBehaviour
                 Press();
             return false;
         };
+        Init();
     }
 
     void Init()
@@ -566,7 +560,7 @@ public class masherTheBottunScript : MonoBehaviour
 
                 Debug.LogFormat("[Masher The Bottun #{0}] The words are {1}, {2}, and {3}.", _moduleId, words[0], words[1], words[2]);
                 Debug.LogFormat("[Masher The Bottun #{0}] Two of the words are from quote #{1}, and one is from quote #{2}.", _moduleId, (doubleUsed + 1) % 10, (singleUsed + 1) % 10);
-                
+
                 Debug.LogFormat("[Masher The Bottun #{0}] You should press the button when the last digit of the timer is {1}.", _moduleId, target);
             }
 
