@@ -262,7 +262,7 @@ public class masherTheBottunScript : MonoBehaviour
                     Info.GetPorts().Contains("RJ45"),
                     Info.GetStrikes() > 0,
                     todayDayOfWeek == DayOfWeek.Monday || todayDayOfWeek == DayOfWeek.Wednesday || todayDayOfWeek == DayOfWeek.Friday,
-                    Info.GetSolvedModuleNames().Count() <= Info.GetSolvedModuleNames().Count() / 2};
+                    Info.GetSolvedModuleNames().Count() <= Info.GetModuleNames().Count() / 2};
                 int[] locations = { 3, 2, 2, 0, 6, 4, 5, 1, 0, 5, 1, 6, 4, 3 }; // first number in each pair = yes, second number = no
 
                 while (!visitedCells[currentCell])
