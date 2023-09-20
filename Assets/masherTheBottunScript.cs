@@ -35,7 +35,7 @@ public class masherTheBottunScript : MonoBehaviour
 
     private int currentCell = 0;
     private int previousBtnColor = 69420;
-    private static readonly DayOfWeek todayDayOfWeek = DateTime.Today.DayOfWeek;
+    private static DayOfWeek todayDayOfWeek;
 
     private static readonly int[] wordFormLengths = { 4, 3, 3, 5, 4, 4, 3, 5, 5, 4, 3, 6, 6, 8, 8, 7, 7, 9, 8, 8 };
 
@@ -60,6 +60,7 @@ public class masherTheBottunScript : MonoBehaviour
     void Start()
     {
         _moduleId = _moduleIdCounter++;
+        todayDayOfWeek = DateTime.Today.DayOfWeek;
         btnSelectable.OnInteract += delegate ()
         {
             btnSelectable.AddInteractionPunch();
@@ -203,9 +204,7 @@ public class masherTheBottunScript : MonoBehaviour
         {
             target = 0;
             bitch = 0;
-            sectionUsed = Random.Range(0, 9);
-            while (previousSections.Contains(sectionUsed))
-                sectionUsed = Random.Range(0, 9);
+            sectionUsed = Enumerable.Range(0, 9).Except(previousSections).PickRandom();
             lastStage = sectionUsed;
             previousSections[stageNo] = sectionUsed;
             stageNo++;
@@ -214,9 +213,7 @@ public class masherTheBottunScript : MonoBehaviour
 
             if (sectionUsed == 0)
             {
-                var color = Random.Range(0, 7);
-                while (color == previousNumberColor)
-                    color = Random.Range(0, 7);
+                var color = Enumerable.Range(0, 7).Except(new[] { previousNumberColor }).PickRandom();
                 previousNumberColor = color;
                 string[] colorNames = { "red", "orange", "yellow", "green", "cyan", "blue", "purple" };
                 screenText.color = numberColors[color];
@@ -244,9 +241,7 @@ public class masherTheBottunScript : MonoBehaviour
 
             if (sectionUsed == 1)
             {
-                var color = Random.Range(0, 7);
-                while (color == previousBtnColor)
-                    color = Random.Range(0, 7);
+                var color = Enumerable.Range(0, 7).Except(new[] { previousBtnColor }).PickRandom();
                 previousBtnColor = color;
                 currentCell = color;
                 string[] colorNames = { "magenta", "cyan", "gray", "blue", "red", "yellow", "green" };
@@ -521,45 +516,33 @@ public class masherTheBottunScript : MonoBehaviour
 
             if (sectionUsed == 7)
             {
-                string[] words = new string[3];
-                string[] phrases = {
-                    "you", "bought", "game",
-                    "that", "is", "no", "work",
-                    "just", "got", "autocorrect", "english", "enabled",
-                    "people", "call", "troll", "it", "really", "dismotivates",
-                    "explain", "myself", "what",
-                    "did", "nobody", "upload", "example", "modification", "before",
-                    "add", "twitch", "play",
-                    "theyre", "all", "challenges",
-                    "make", "easy", "modules", "and", "then", "harder",
-                    "objects", "made" };
-                int[] starts = { 0, 3, 7, 12, 18, 21, 27, 30, 33, 39 };
-                int[] lengths = { 3, 4, 5, 6, 3, 6, 3, 3, 6, 2 };
-
-                int doubleUsed = Random.Range(0, 10);
-                int singleUsed = Random.Range(0, 10);
-                while (singleUsed == doubleUsed)
-                    singleUsed = Random.Range(0, 10);
-                int index = Random.Range(0, 3);
-                for (int i = 0; i < 3; i++)
+                string[][] phrases = new string[][]
                 {
-                    if (i == 0)
-                        words[index] = phrases[starts[singleUsed] + Random.Range(0, lengths[singleUsed])];
-                    else
-                    {
-                        words[index] = phrases[starts[doubleUsed] + Random.Range(0, lengths[doubleUsed])];
-                        while (words.ToList().Where(x => x == words[index]).Count() > 1)
-                            words[index] = phrases[starts[doubleUsed] + Random.Range(0, lengths[doubleUsed])];
-                    }
-                    index++;
-                    index %= 3;
-                }
+                    new string[] { "you", "bought", "game" },
+                    new string[] { "that", "is", "no", "work", },
+                    new string[] { "just", "got", "autocorrect", "english", "enabled" },
+                    new string[] { "people", "call", "troll", "it", "really", "dismotivates" },
+                    new string[] { "explain", "myself", "what" },
+                    new string[] { "did", "nobody", "upload", "example", "modification", "before" },
+                    new string[] { "add", "twitch", "play" },
+                    new string[] { "theyre", "all", "challenges" },
+                    new string[] { "make", "easy", "modules", "and", "then", "harder" },
+                    new string[] { "[BEEP]", "made" }
+                };
+
+                int doubleIx = Random.Range(0, 10);
+                int singleIx = Enumerable.Range(0, 10).Except(new[] { doubleIx }).PickRandom();
+
+                var doubleWords = phrases[doubleIx].ToArray().Shuffle().Take(2).ToArray();
+                var singleWord = phrases[singleIx].ToArray().Shuffle()[0];
+
+                string[] words = new[] { doubleWords[0], doubleWords[1], singleWord }.ToArray().Shuffle();
 
                 StartCoroutine(SayStuff(words));
-                target = (singleUsed + 1) % 10;
+                target = (singleIx + 1) % 10;
 
                 Debug.LogFormat("[Masher The Bottun #{0}] The words are {1}, {2}, and {3}.", _moduleId, words[0], words[1], words[2]);
-                Debug.LogFormat("[Masher The Bottun #{0}] Two of the words are from quote #{1}, and one is from quote #{2}.", _moduleId, (doubleUsed + 1) % 10, (singleUsed + 1) % 10);
+                Debug.LogFormat("[Masher The Bottun #{0}] Two of the words are from quote #{1}, and one is from quote #{2}.", _moduleId, (doubleIx + 1) % 10, (singleIx + 1) % 10);
 
                 Debug.LogFormat("[Masher The Bottun #{0}] You should press the button when the last digit of the timer is {1}.", _moduleId, target);
             }
