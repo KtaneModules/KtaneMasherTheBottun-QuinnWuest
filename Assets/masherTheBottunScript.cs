@@ -270,13 +270,34 @@ public class masherTheBottunScript : MonoBehaviour
                 }
                 switch (currentCell)
                 {
-                    case 0: bgColorTargets = new int[] { 5, 15, 25, 35, 45, 55 }; Debug.LogFormat("[Masher The Bottun #{0}] You should press the button when the last seconds digit is a 5.", _moduleId); break;
-                    case 1: bgColorTargets = new int[] { 19, 28, 37, 46, 55 }; Debug.LogFormat("[Masher The Bottun #{0}] You should press the button when the seconds digits add up to 10.", _moduleId); break;
-                    case 2: bgColorTargets = new int[] { 7, 17, 27, 37, 47, 57 }; Debug.LogFormat("[Masher The Bottun #{0}] You should press the button when the last seconds digit is a 7.", _moduleId); break;
-                    case 3: bgColorTargets = new int[] { 0, 10, 20, 30, 40, 50 }; Debug.LogFormat("[Masher The Bottun #{0}] You should press the button when the last seconds digit is a 0.", _moduleId); break;
-                    case 4: bgColorTargets = new int[] { 7, 16, 25, 34, 43, 52 }; Debug.LogFormat("[Masher The Bottun #{0}] You should press the button when the seconds digits add up to 7.", _moduleId); break;
-                    case 5: bgColorTargets = new int[] { 0, 11, 22, 33, 44, 55 }; Debug.LogFormat("[Masher The Bottun #{0}] You should press the button when the seconds digits are the same.", _moduleId); break;
-                    case 6: bgColorTargets = new int[] { 3, 14, 25, 36, 47, 58 }; Debug.LogFormat("[Masher The Bottun #{0}] You should press the button when the difference between the seconds digits is 3.", _moduleId); break;
+                    case 0:
+                        bgColorTargets = Enumerable.Range(0, 60).Where(i => i % 10 == 5).ToArray();
+                        Debug.LogFormat("[Masher The Bottun #{0}] You should press the button when the last seconds digit is a 5.", _moduleId);
+                        break;
+                    case 1:
+                        bgColorTargets = Enumerable.Range(0, 60).Where(i => (i / 10) + (i % 10) == 10).ToArray();
+                        Debug.LogFormat("[Masher The Bottun #{0}] You should press the button when the seconds digits add up to 10.", _moduleId);
+                        break;
+                    case 2:
+                        bgColorTargets = Enumerable.Range(0, 60).Where(i => i % 10 == 7).ToArray();
+                        Debug.LogFormat("[Masher The Bottun #{0}] You should press the button when the last seconds digit is a 7.", _moduleId);
+                        break;
+                    case 3:
+                        bgColorTargets = Enumerable.Range(0, 60).Where(i => i % 10 == 0).ToArray();
+                        Debug.LogFormat("[Masher The Bottun #{0}] You should press the button when the last seconds digit is a 0.", _moduleId);
+                        break;
+                    case 4:
+                        bgColorTargets = Enumerable.Range(0, 60).Where(i => (i / 10) + (i % 10) == 7).ToArray();
+                        Debug.LogFormat("[Masher The Bottun #{0}] You should press the button when the seconds digits add up to 7.", _moduleId);
+                        break;
+                    case 5:
+                        bgColorTargets = Enumerable.Range(0, 60).Where(i => i % 11 == 0).ToArray();
+                        Debug.LogFormat("[Masher The Bottun #{0}] You should press the button when the seconds digits are the same.", _moduleId);
+                        break;
+                    case 6:
+                        bgColorTargets = Enumerable.Range(0, 60).Where(i => Math.Abs((i / 10) - (i % 10)) == 3).ToArray();
+                        Debug.LogFormat("[Masher The Bottun #{0}] You should press the button when the difference between the seconds digits is 3.", _moduleId);
+                        break;
                 }
             }
 
@@ -373,7 +394,7 @@ public class masherTheBottunScript : MonoBehaviour
                     if (letter == 'M' || letter == 'Z')
                     {
                         target -= xValue;
-                        xValue = numberDisplayed % 10 + numberDisplayed / 10 % 6;
+                        xValue = numberDisplayed % 10 + numberDisplayed / 10;
                     }
 
                     xValue %= 20;
